@@ -157,6 +157,23 @@ export class MPLCanvasModel extends DOMWidgetModel {
         document.body.removeChild(save);
     }
 
+    handle_copy() {
+        (async () => {
+            try {
+                const imgURL = this.offscreen_canvas.toDataURL('image/png');
+                const data = await fetch(imgURL);
+                const blob = await data.blob();
+                await (navigator.clipboard as any).write([
+                    new ClipboardItem({
+                        [blob.type]: blob
+                    })
+                ]);
+            } catch (err) {
+                console.error(err.name, err.message);
+            }
+        })();
+    }
+    
     handle_resize(msg: { [index: string]: any }) {
         this.resize_canvas();
         this.offscreen_context.drawImage(this.image, 0, 0);
