@@ -148,7 +148,30 @@ export class MPLCanvasModel extends DOMWidgetModel {
         }
     }
 
-    handle_save() {
+    handle_download(
+        msg: { [index: string]: any },
+        buffers: (ArrayBuffer | ArrayBufferView)[]
+    ) {
+        const buffer = new Uint8Array(
+            ArrayBuffer.isView(buffers[0]) ? buffers[0].buffer : buffers[0]
+        );
+        const blob = new Blob([buffer], { type: msg.mimetype });
+
+        const url_creator = window.URL || window.webkitURL;
+        const image_url = url_creator.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = image_url;
+        a.download = msg.name + '.' + msg.format;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            url_creator.revokeObjectURL(image_url);
+            a.remove();
+        }, 1000);
+    }
+
+    handle_save_png() {
         const save = document.createElement('a');
         save.href = this.offscreen_canvas.toDataURL();
         save.download = this.get('_figure_label') + '.png';
@@ -164,31 +187,18 @@ export class MPLCanvasModel extends DOMWidgetModel {
                     alert('Failed to copy the image');
                     return;
                 }
-                navigator.clipboard.write([
-                    new ClipboardItem({
-                        [blob.type]: blob,
-                    }),
-                ]);
+                navigator.clipboard
+                    .write([
+                        new ClipboardItem({
+                            [blob.type]: blob,
+                        }),
+                    ])
+                    .catch((err) => alert(err));
             });
         } else {
             alert(
                 'Your browser does not support copying images by click. See https://caniuse.com/mdn-api_clipboarditem'
             );
-
-            // const img = document.createElement('img');
-            // img.src = this.offscreen_canvas.toDataURL();
-            // const div = document.createElement('div');
-            // (div.contentEditable as unknown as boolean) = true;
-            // div.appendChild(img);
-            // document.body.appendChild(div);
-            // div.focus();
-            // const selection = window.getSelection();
-            // if (selection) {
-            //     selection.selectAllChildren(div);
-            //     const result = document.execCommand('copy');
-            //     console.log(result);
-            // }
-            // document.body.removeChild(div);
         }
     }
 

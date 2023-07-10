@@ -21,6 +21,18 @@
     padding: 0 !important;
 }
 
+.jupyter-matplotlib-button > i:last-of-type {
+    display: none;
+}
+
+.jupyter-matplotlib-button-loading > i:first-of-type {
+    display: none;
+}
+
+.jupyter-matplotlib-button-loading > i:last-of-type {
+    display: inline-block;
+}
+
 /* Figure */
 
 .jupyter-matplotlib-figure {

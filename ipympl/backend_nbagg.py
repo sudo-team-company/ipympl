@@ -19,6 +19,7 @@ except ModuleNotFoundError:
 import io
 import json
 from base64 import b64encode
+from mimetypes import types_map
 
 try:
     from collections.abc import Iterable
@@ -145,16 +146,22 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
             'forward': 'arrow-right',
             'zoom_to_rect': 'square-o',
             'move': 'arrows',
-            'download': 'floppy-o',
             'export': 'file-picture-o',
+            'save_pdf': 'file-pdf-o',
+            'save_svg': 'file-code-o',
+            'save_png': 'file-image-o',
             'copy': 'copy',
         }
 
-        download_item = ('Download', 'Download plot', 'download', 'save_figure')
-        copy_item = ('Copy', 'Copy plot', 'copy', 'copy_figure')
+        save_pdf_item = ('Save PDF', 'Save the figure as PDF', 'save_pdf', 'save_pdf')
+        save_svg_item = ('Save SVG', 'Save the figure as SVG', 'save_svg', 'save_svg')
+        save_png_item = ('Save PNG', 'Save the figure as PNG', 'save_png', 'save_png')
+        copy_item = ('Copy', 'Copy the figure', 'copy', 'copy')
 
         toolitems = NavigationToolbar2.toolitems + (
-            download_item,
+            save_pdf_item,
+            save_svg_item,
+            save_png_item,
             copy_item,
         )
 
@@ -174,7 +181,16 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
 
         return super().__getattr__(name)
 
-    def copy_figure(self, *args):
+    def save_pdf(self, *args):
+        self.canvas.send_event('save_pdf')
+
+    def save_svg(self, *args):
+        self.canvas.send_event('save_svg')
+
+    def save_png(self, *args):
+        self.canvas.send_event('save_png')
+
+    def copy(self, *args):
         self.canvas.send_event('copy')
 
     @observe('orientation', 'collapsed')
@@ -282,6 +298,32 @@ class Canvas(DOMWidget, FigureCanvasWebAggCore):
         elif content['type'] == 'set_dpi_ratio':
             Canvas.current_dpi_ratio = content['dpi_ratio']
             self.manager.handle_json(content)
+
+        elif content['type'] == 'toolbar_button' and content['name'] in ['save', 'save_pdf', 'save_svg']:
+            name = self._figure_label
+            if 'format' in content:
+                fmt = content['format']
+            elif content['name'] == 'save_pdf':
+                fmt = 'pdf'
+            elif content['name'] == 'save_svg':
+                fmt = 'svg'
+            else:
+                fmt = matplotlib.rcParams['savefig.format']
+                if fmt in ('', 'png'):
+                    fmt = 'svg'
+
+            mimetype = types_map['.' + fmt]
+
+            buf = io.BytesIO()
+            self.figure.savefig(buf, format=fmt)
+
+            data = {
+                "type": "download",
+                "name": name,
+                "format": fmt,
+                "mimetype": mimetype,
+            }
+            self.send({'data': json.dumps(data)}, buffers=[buf.getbuffer()])
 
         else:
             self.manager.handle_json(content)

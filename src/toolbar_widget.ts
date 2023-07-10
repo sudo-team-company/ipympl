@@ -83,6 +83,16 @@ export class ToolbarView extends DOMWidgetView {
             icon.classList.add('center', 'fa', 'fa-fw', 'fa-' + image);
             button.appendChild(icon);
 
+            const spinner = document.createElement('i');
+            spinner.classList.add(
+                'center',
+                'fa',
+                'fa-fw',
+                'fa-spin',
+                'fa-spinner'
+            );
+            button.appendChild(spinner);
+
             this.buttons[method_name] = button;
 
             this.toolbar.appendChild(button);
@@ -154,11 +164,29 @@ export class ToolbarView extends DOMWidgetView {
                 this.model.save_changes();
             }
 
+            if (name === 'save_pdf' || name === 'save_svg') {
+                this.set_button_active(name, false);
+                // TODO: Use callbacks to set buttons active
+                setTimeout(() => {
+                    this.set_button_active(name, true);
+                }, 3000);
+            }
+
             this.send({
                 type: 'toolbar_button',
                 name: name,
             });
         };
+    }
+
+    set_button_active(name: string, isActive: boolean) {
+        const button = this.buttons[name];
+        button.disabled = !isActive;
+        if (isActive) {
+            button.classList.remove('jupyter-matplotlib-button-loading');
+        } else {
+            button.classList.add('jupyter-matplotlib-button-loading');
+        }
     }
 
     set_visibility(
