@@ -74,6 +74,7 @@ def connection_info():
     Return a string showing the figure and connection status for
     the backend. This is intended as a diagnostic tool, and not for general
     use.
+
     """
     result = []
     for manager in Gcf.get_all_fig_managers():
@@ -152,7 +153,10 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
         download_item = ('Download', 'Download plot', 'download', 'save_figure')
         copy_item = ('Copy', 'Copy plot', 'copy', 'copy_figure')
 
-        toolitems = NavigationToolbar2.toolitems + (download_item,) + (copy_item,)
+        toolitems = NavigationToolbar2.toolitems + (
+            download_item,
+            copy_item,
+        )
 
         return [
             (text, tooltip, icons[icon_name], method_name)
@@ -169,10 +173,10 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
             )
 
         return super().__getattr__(name)
-    
+
     def copy_figure(self, *args):
         self.canvas.send_event('copy')
-    
+
     @observe('orientation', 'collapsed')
     def _on_orientation_collapsed_changed(self, change):
         warn(

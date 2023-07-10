@@ -1,4 +1,3 @@
-/// <reference path="types.d.ts" />
 import { throttle } from 'lodash';
 
 import {
@@ -159,22 +158,40 @@ export class MPLCanvasModel extends DOMWidgetModel {
     }
 
     handle_copy() {
-        (async () => {
-            try {
-                const imgURL = this.offscreen_canvas.toDataURL('image/png');
-                const data = await fetch(imgURL);
-                const blob = await data.blob();
-                await (navigator.clipboard as any).write([
+        if (typeof ClipboardItem !== 'undefined') {
+            this.offscreen_canvas.toBlob((blob) => {
+                if (blob === null) {
+                    alert('Failed to copy the image');
+                    return;
+                }
+                navigator.clipboard.write([
                     new ClipboardItem({
-                        [blob.type]: blob
-                    })
+                        [blob.type]: blob,
+                    }),
                 ]);
-            } catch (err) {
-                console.error(err.name, err.message);
-            }
-        })();
+            });
+        } else {
+            alert(
+                'Your browser does not support copying images by click. See https://caniuse.com/mdn-api_clipboarditem'
+            );
+
+            // const img = document.createElement('img');
+            // img.src = this.offscreen_canvas.toDataURL();
+            // const div = document.createElement('div');
+            // (div.contentEditable as unknown as boolean) = true;
+            // div.appendChild(img);
+            // document.body.appendChild(div);
+            // div.focus();
+            // const selection = window.getSelection();
+            // if (selection) {
+            //     selection.selectAllChildren(div);
+            //     const result = document.execCommand('copy');
+            //     console.log(result);
+            // }
+            // document.body.removeChild(div);
+        }
     }
-    
+
     handle_resize(msg: { [index: string]: any }) {
         this.resize_canvas();
         this.offscreen_context.drawImage(this.image, 0, 0);
