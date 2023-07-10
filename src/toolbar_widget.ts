@@ -66,6 +66,10 @@ export class ToolbarView extends DOMWidgetView {
             }
 
             const button = document.createElement('button');
+            if (name == 'Copy' && typeof ClipboardItem === "undefined"){
+                (button as HTMLInputElement).disabled = true;
+                continue;
+            }
             button.classList.add(
                 'jupyter-matplotlib-button',
                 'jupyter-widgets',
