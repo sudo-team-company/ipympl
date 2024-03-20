@@ -193,13 +193,13 @@ export class ToolbarView extends DOMWidgetView {
                 this.model.save_changes();
             }
 
-            if (name === 'save_pdf' || name === 'save_svg') {
+            /*if (name === 'save_pdf' || name === 'save_svg') {
                 this.set_button_active(name, false);
                 // TODO: Use callbacks to set buttons active
                 setTimeout(() => {
                     this.set_button_active(name, true);
                 }, 3000);
-            }
+            }*/
 
             this.send({
                 type: 'toolbar_button',
