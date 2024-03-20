@@ -56,6 +56,31 @@ export class ToolbarView extends DOMWidgetView {
         this.el.appendChild(this.toolbar);
         this.buttons = {};
 
+        var dropdownContent = document.createElement("div");
+        dropdownContent.className = "dropdown-content";
+        dropdownContent.id = "myDropdown";
+        var link1 = document.createElement("a");
+        link1.textContent = "PDF";
+        link1.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_pdf")
+        );
+        var link2 = document.createElement("a");
+        link2.textContent = "SVG";
+        link2.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_svg")
+        );
+        var link3 = document.createElement("a");
+        link3.textContent = "PNG";
+        link3.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_png")
+        );
+        dropdownContent.appendChild(link1);
+        dropdownContent.appendChild(link2);
+        dropdownContent.appendChild(link3);
+        
         for (const toolbar_ind in toolbar_items) {
             const name = toolbar_items[toolbar_ind][0];
             const tooltip = toolbar_items[toolbar_ind][1];
@@ -93,6 +118,10 @@ export class ToolbarView extends DOMWidgetView {
             );
             button.appendChild(spinner);
 
+            if (name == 'Save') {
+                button.appendChild(dropdownContent);
+            }
+            
             this.buttons[method_name] = button;
 
             this.toolbar.appendChild(button);
