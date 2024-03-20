@@ -147,24 +147,18 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
             'zoom_to_rect': 'square-o',
             'move': 'arrows',
             'export': 'file-picture-o',
-            'save_pdf': 'file-pdf-o',
-            'save_svg': 'file-code-o',
-            'save_png': 'file-image-o',
             'copy': 'copy',
+            'save': 'save',
         }
-
-        save_pdf_item = ('Save PDF', 'Save the figure as PDF', 'save_pdf', 'save_pdf')
-        save_svg_item = ('Save SVG', 'Save the figure as SVG', 'save_svg', 'save_svg')
-        save_png_item = ('Save PNG', 'Save the figure as PNG', 'save_png', 'save_png')
+        
         copy_item = ('Copy', 'Copy the figure', 'copy', 'copy')
+        save_item = ('Save', 'Save the figure as','save', 'dropdown')
 
         toolitems = NavigationToolbar2.toolitems + (
-            save_pdf_item,
-            save_svg_item,
-            save_png_item,
             copy_item,
+            save_item,
         )
-
+        
         return [
             (text, tooltip, icons[icon_name], method_name)
             for text, tooltip, icon_name, method_name in toolitems
@@ -193,6 +187,9 @@ class Toolbar(DOMWidget, NavigationToolbar2WebAgg):
     def copy(self, *args):
         self.canvas.send_event('copy')
 
+    def dropdown(self, *args):
+        self.canvas.send_event('dropdown')
+    
     @observe('orientation', 'collapsed')
     def _on_orientation_collapsed_changed(self, change):
         warn(
