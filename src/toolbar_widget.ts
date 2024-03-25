@@ -24,7 +24,7 @@ export class ToolbarModel extends DOMWidgetModel {
 
 export class ToolbarView extends DOMWidgetView {
     toolbar: HTMLDivElement;
-    buttons: { [index: string]: HTMLButtonElement };
+    buttons: { [index: string]: HTMLAnchorElement };
     visibility: 'visible' | 'hidden' | 'fade-in-fade-out' = 'fade-in-fade-out';
 
     initialize(parameters: any) {
@@ -65,18 +65,21 @@ export class ToolbarView extends DOMWidgetView {
             'click',
             this.toolbar_button_onclick("save_pdf")
         );
+        this.buttons["save_pdf"] = link1;
         var link2 = document.createElement("a");
         link2.textContent = "SVG";
         link2.addEventListener(
             'click',
             this.toolbar_button_onclick("save_svg")
         );
+        this.buttons["save_svg"] = link2;
         var link3 = document.createElement("a");
         link3.textContent = "PNG";
         link3.addEventListener(
             'click',
             this.toolbar_button_onclick("save_png")
         );
+        this.buttons["save_png"] = link3;
         dropdownContent.appendChild(link1);
         dropdownContent.appendChild(link2);
         dropdownContent.appendChild(link3);
@@ -121,8 +124,6 @@ export class ToolbarView extends DOMWidgetView {
             if (name == 'Save') {
                 button.appendChild(dropdownContent);
             }
-            
-            this.buttons[method_name] = button;
 
             this.toolbar.appendChild(button);
         }
