@@ -24,7 +24,7 @@ export class ToolbarModel extends DOMWidgetModel {
 
 export class ToolbarView extends DOMWidgetView {
     toolbar: HTMLDivElement;
-    buttons: { [index: string]: HTMLButtonElement };
+    buttons: { [index: string]: HTMLAnchorElement };
     visibility: 'visible' | 'hidden' | 'fade-in-fade-out' = 'fade-in-fade-out';
 
     initialize(parameters: any) {
@@ -56,6 +56,34 @@ export class ToolbarView extends DOMWidgetView {
         this.el.appendChild(this.toolbar);
         this.buttons = {};
 
+        var dropdownContent = document.createElement("div");
+        dropdownContent.className = "dropdown-content";
+        dropdownContent.id = "myDropdown";
+        var link1 = document.createElement("a");
+        link1.textContent = "PDF";
+        link1.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_pdf")
+        );
+        this.buttons["save_pdf"] = link1;
+        var link2 = document.createElement("a");
+        link2.textContent = "SVG";
+        link2.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_svg")
+        );
+        this.buttons["save_svg"] = link2;
+        var link3 = document.createElement("a");
+        link3.textContent = "PNG";
+        link3.addEventListener(
+            'click',
+            this.toolbar_button_onclick("save_png")
+        );
+        this.buttons["save_png"] = link3;
+        dropdownContent.appendChild(link1);
+        dropdownContent.appendChild(link2);
+        dropdownContent.appendChild(link3);
+        
         for (const toolbar_ind in toolbar_items) {
             const name = toolbar_items[toolbar_ind][0];
             const tooltip = toolbar_items[toolbar_ind][1];
@@ -74,10 +102,17 @@ export class ToolbarView extends DOMWidgetView {
             button.setAttribute('href', '#');
             button.setAttribute('title', tooltip);
             button.style.outline = 'none';
-            button.addEventListener(
-                'click',
-                this.toolbar_button_onclick(method_name)
-            );
+             if (name != 'Save') {
+                button.addEventListener(
+                    'click',
+                    this.toolbar_button_onclick(method_name)
+                );
+            } else {
+                button.addEventListener(
+                    'click',
+                    (e) => dropdownContent.classList.toggle("show")
+                );
+            }
 
             const icon = document.createElement('i');
             icon.classList.add('center', 'fa', 'fa-fw', 'fa-' + image);
@@ -93,7 +128,9 @@ export class ToolbarView extends DOMWidgetView {
             );
             button.appendChild(spinner);
 
-            this.buttons[method_name] = button;
+            if (name == 'Save') {
+                button.appendChild(dropdownContent);
+            }
 
             this.toolbar.appendChild(button);
         }
@@ -181,7 +218,6 @@ export class ToolbarView extends DOMWidgetView {
 
     set_button_active(name: string, isActive: boolean) {
         const button = this.buttons[name];
-        button.disabled = !isActive;
         if (isActive) {
             button.classList.remove('jupyter-matplotlib-button-loading');
         } else {

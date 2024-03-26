@@ -201,7 +201,7 @@ export class MPLCanvasModel extends DOMWidgetModel {
             );
         }
     }
-
+    
     handle_resize(msg: { [index: string]: any }) {
         this.resize_canvas();
         this.offscreen_context.drawImage(this.image, 0, 0);
