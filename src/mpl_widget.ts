@@ -201,10 +201,6 @@ export class MPLCanvasModel extends DOMWidgetModel {
             );
         }
     }
-
-    handle_dropdown() {
-        document.getElementById("myDropdown")!.classList.toggle("show");
-    }
     
     handle_resize(msg: { [index: string]: any }) {
         this.resize_canvas();
