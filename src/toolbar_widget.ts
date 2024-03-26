@@ -102,10 +102,17 @@ export class ToolbarView extends DOMWidgetView {
             button.setAttribute('href', '#');
             button.setAttribute('title', tooltip);
             button.style.outline = 'none';
-            button.addEventListener(
-                'click',
-                this.toolbar_button_onclick(method_name)
-            );
+             if (name != 'Save') {
+                button.addEventListener(
+                    'click',
+                    this.toolbar_button_onclick(method_name)
+                );
+            } else {
+                button.addEventListener(
+                    'click',
+                    (e) => dropdownContent.classList.toggle("show")
+                );
+            }
 
             const icon = document.createElement('i');
             icon.classList.add('center', 'fa', 'fa-fw', 'fa-' + image);
@@ -211,7 +218,6 @@ export class ToolbarView extends DOMWidgetView {
 
     set_button_active(name: string, isActive: boolean) {
         const button = this.buttons[name];
-        button.disabled = !isActive;
         if (isActive) {
             button.classList.remove('jupyter-matplotlib-button-loading');
         } else {
